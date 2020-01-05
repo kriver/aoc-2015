@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 phf = { version = "0.8.0", features = ["macros"] }
+md5 = "0.7.0"
 
 [lib]
 name = "util"
@@ -24,3 +25,7 @@ path = "src/day2.rs"
 [[bin]]
 name = "day3"
 path = "src/day3.rs"
+
+[[bin]]
+name = "day4"
+path = "src/day4.rs"
