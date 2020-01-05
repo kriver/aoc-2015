@@ -1,11 +1,13 @@
 use util::load;
-use std::collections::HashSet;
 use regex::{Regex, Match};
+use num_bigint::BigInt;
+use num_traits::{Zero, One};
+use array_macro::array;
 
 #[macro_use]
 extern crate lazy_static;
 
-type Lights = HashSet<(u32, u32)>;
+type Lights = [BigInt; 1000];
 
 enum Action {
     On,
@@ -70,30 +72,37 @@ impl Instruction {
     }
 }
 
+fn ones(lower: usize, upper: usize) -> BigInt {
+    let one: BigInt = One::one();
+    let ones = (one << (upper - lower + 1)) - 1u8;
+    ones << lower
+}
+
 fn process_instruction(lights: &mut Lights, from: &Coord, to: &Coord, action: &Action) {
+    assert!(from.y <= to.y, "{} <= {}", from.y, to.y);
     for y in from.y..(to.y + 1) {
-        for x in from.x..(to.x + 1) {
-            match action {
-                Action::On => { lights.insert((x, y)); },
-                Action::Off => { lights.remove(&(x, y)); },
-                Action::Toggle =>
-                    if lights.contains(&(x, y)) {
-                        lights.remove(&(x, y));
-                    } else {
-                        lights.insert((x, y));
-                    }
-            }
+        assert!(from.x <= to.x, "{} <= {}", from.x, to.x);
+        let bits = ones(from.x as usize, to.x as usize);
+        let i = y as usize;
+        match action {
+            Action::On => lights[i] = &lights[i] | &bits,
+            Action::Off => lights[i] = &lights[i] & !&bits,
+            Action::Toggle => lights[i] = &lights[i] ^ &bits
         }
     }
 }
 
 fn count_lights(instructions: &Vec<Instruction>) -> usize {
-    let mut lights: Lights = HashSet::new();
+    let mut lights: Lights = array![Zero::zero(); 1000];
     for (i, instr) in instructions.iter().enumerate() {
         println!("Processing step {}", i);
         process_instruction(&mut lights, &instr.from, &instr.to, &instr.action);
     }
-    lights.len()
+    lights.iter()
+        .map(|i| i.to_str_radix(2))
+        .map(|s| s.replace("0", ""))
+        .map(|s| s.len())
+        .fold(0, |acc, i| acc + i)
 }
 
 fn parse(lines: &Vec<String>) -> Vec<Instruction> {
