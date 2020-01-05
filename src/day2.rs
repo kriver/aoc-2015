@@ -1,6 +1,5 @@
 use std::cmp::min;
-use std::fs::File;
-use std::io::{BufReader, BufRead};
+use util::load;
 
 fn dim2vec(dim: &str) -> Vec<i32> {
     dim.split('x')
@@ -21,14 +20,6 @@ fn ribbon(dim: Vec<i32>) -> i32 {
     let b = 2 * dim[1] + 2 * dim[2];
     let c = 2 * dim[2] + 2 * dim[0];
     min(a, min(b, c)) + dim[0] * dim[1] * dim[2]
-}
-
-fn load(filename: &str) -> Vec<String> {
-    let file = File::open(filename).unwrap();
-    let reader = BufReader::new(file);
-    reader.lines()
-        .map(|l| l.unwrap())
-        .collect()
 }
 
 fn main() {

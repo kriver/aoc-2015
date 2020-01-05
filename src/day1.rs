@@ -1,13 +1,4 @@
-use std::fs::File;
-use std::io::{BufReader, BufRead};
-
-fn load(filename: &str) -> String {
-    let file = File::open(filename).unwrap();
-    let mut reader = BufReader::new(file);
-    let mut buf = String::new();
-    reader.read_line(&mut buf).expect("successful read");
-    return buf;
-}
+use util::load;
 
 fn floor(directions: &str) -> (i32, Option<i32>) {
     let mut floor = 0;
@@ -37,5 +28,5 @@ fn main() {
     assert_eq!(floor(")())())"), (-3, Some(1)));
 
     let directions = load("data/day1.txt");
-    assert_eq!(floor(directions.as_str()), (138, Some(1771)));
+    assert_eq!(floor(directions[0].as_str()), (138, Some(1771)));
 }
