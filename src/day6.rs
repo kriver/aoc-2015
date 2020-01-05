@@ -1,13 +1,11 @@
 use util::load;
 use regex::{Regex, Match};
-use num_bigint::BigInt;
-use num_traits::{Zero, One};
-use array_macro::array;
 
 #[macro_use]
 extern crate lazy_static;
 
-type Lights = [BigInt; 1000];
+type Lights = [[u32; 1000]; 1000];
+type Act = dyn Fn(&Lights, usize, usize, &Action) -> u32;
 
 enum Action {
     On,
@@ -72,37 +70,44 @@ impl Instruction {
     }
 }
 
-fn ones(lower: usize, upper: usize) -> BigInt {
-    let one: BigInt = One::one();
-    let ones = (one << (upper - lower + 1)) - 1u8;
-    ones << lower
+fn act_1(lights: &Lights, x: usize, y: usize, action: &Action) -> u32 {
+    let prev = &lights[y][x];
+    match action {
+        Action::On => 1,
+        Action::Off => 0,
+        Action::Toggle => 1 - prev,
+    }
 }
 
-fn process_instruction(lights: &mut Lights, from: &Coord, to: &Coord, action: &Action) {
+fn act_2(lights: &Lights, x: usize, y: usize, action: &Action) -> u32 {
+    let prev = &lights[y][x];
+    match action {
+        Action::On => prev + 1,
+        Action::Off => if prev > &0 { prev - 1 } else { 0 },
+        Action::Toggle => prev + 2,
+    }
+}
+
+fn process_instruction(lights: &mut Lights, from: &Coord, to: &Coord, action: &Action, act: &Act) {
     assert!(from.y <= to.y, "{} <= {}", from.y, to.y);
     for y in from.y..(to.y + 1) {
         assert!(from.x <= to.x, "{} <= {}", from.x, to.x);
-        let bits = ones(from.x as usize, to.x as usize);
-        let i = y as usize;
-        match action {
-            Action::On => lights[i] = &lights[i] | &bits,
-            Action::Off => lights[i] = &lights[i] & !&bits,
-            Action::Toggle => lights[i] = &lights[i] ^ &bits
+        for x in from.x..(to.x + 1) {
+            let xu = x as usize;
+            let yu = y as usize;
+            lights[yu][xu] = act(lights, xu, yu, action);
         }
     }
 }
 
-fn count_lights(instructions: &Vec<Instruction>) -> usize {
-    let mut lights: Lights = array![Zero::zero(); 1000];
-    for (i, instr) in instructions.iter().enumerate() {
-        println!("Processing step {}", i);
-        process_instruction(&mut lights, &instr.from, &instr.to, &instr.action);
+fn count_lights(instructions: &Vec<Instruction>, act: &Act) -> u32 {
+    let mut lights: Lights = [[0u32; 1000]; 1000];
+    for instr in instructions.iter() {
+        process_instruction(&mut lights, &instr.from, &instr.to, &instr.action, act);
     }
     lights.iter()
-        .map(|i| i.to_str_radix(2))
-        .map(|s| s.replace("0", ""))
-        .map(|s| s.len())
-        .fold(0, |acc, i| acc + i)
+        .map(|row| row.iter().fold(0, |acc, x| acc + *x))
+        .fold(0, |acc, x| acc + x)
 }
 
 fn parse(lines: &Vec<String>) -> Vec<Instruction> {
@@ -113,5 +118,6 @@ fn parse(lines: &Vec<String>) -> Vec<Instruction> {
 
 fn main() {
     let instructions = parse(&load("data/day6.txt"));
-    assert_eq!(count_lights(&instructions), 543903);
+    assert_eq!(count_lights(&instructions, &act_1), 543903);
+    assert_eq!(count_lights(&instructions, &act_2), 14687245);
 }
