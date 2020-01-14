@@ -1,5 +1,5 @@
-use util::load;
-use regex::{Regex, Match};
+use regex::{Regex};
+use aoc_2015::{int_from_capture, load};
 
 #[macro_use]
 extern crate lazy_static;
@@ -35,16 +35,6 @@ impl Action {
     }
 }
 
-fn match_to_integer(m: &Option<Match>) -> u32 {
-    match m.map(|x| x.as_str()) {
-        Some(s) => match s.parse() {
-            Ok(i) => i,
-            Err(_) => unreachable!(s)
-        },
-        None => unreachable!("should be integer string")
-    }
-}
-
 impl Instruction {
     pub fn new(line: &str) -> Instruction {
         lazy_static! {
@@ -57,12 +47,12 @@ impl Instruction {
                     None => unreachable!("should be action string")
                 },
                 from: Coord {
-                    x: match_to_integer(&caps.get(2)),
-                    y: match_to_integer(&caps.get(3)),
+                    x: int_from_capture(&caps, 2),
+                    y: int_from_capture(&caps, 3),
                 },
                 to: Coord {
-                    x: match_to_integer(&caps.get(4)),
-                    y: match_to_integer(&caps.get(5)),
+                    x: int_from_capture(&caps, 4),
+                    y: int_from_capture(&caps, 5),
                 },
             },
             None => unreachable!(line)

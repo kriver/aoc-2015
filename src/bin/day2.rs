@@ -1,5 +1,5 @@
 use std::cmp::min;
-use util::load;
+use aoc_2015::load;
 
 fn dim2vec(dim: &str) -> Vec<i32> {
     dim.split('x')

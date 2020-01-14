@@ -1,5 +1,5 @@
-use util::load;
 use std::collections::HashMap;
+use aoc_2015::load;
 
 type Wires<'a> = HashMap<&'a str, u16>;
 

@@ -1,4 +1,4 @@
-use util::load;
+use aoc_2015::load;
 
 fn floor(directions: &str) -> (i32, Option<i32>) {
     let mut floor = 0;

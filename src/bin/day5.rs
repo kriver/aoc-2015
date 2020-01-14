@@ -1,5 +1,5 @@
-use util::load;
 use std::collections::HashMap;
+use aoc_2015::load;
 
 fn is_nice(s: &str) -> bool {
     let mut vowels = 0;

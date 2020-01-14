@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use phf::phf_map;
-use util::load;
+use aoc_2015::load;
 
 static DIR: phf::Map<char, (i32, i32)> = phf_map! {
     '<' => (-1, 0),

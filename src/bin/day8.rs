@@ -1,4 +1,4 @@
-use util::load;
+use aoc_2015::load;
 
 fn count_decoded(s: &str) -> (usize, usize) {
     let mut sz = 0;
