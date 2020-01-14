@@ -27,17 +27,17 @@ fn main() {
     assert_eq!(wrapping_paper(dim2vec("1x1x10")), 43);
 
     let sizes = load("data/day2.txt");
-    let total_paper = sizes.iter()
+    let total_paper: i32 = sizes.iter()
         .map(|s| dim2vec(s))
-        .map(|d| wrapping_paper(d))
-        .fold(0, |acc, s| acc + s);
-    assert_eq!(total_paper, 1586300);
+        .map(wrapping_paper)
+        .sum();
+    assert_eq!(total_paper, 1_586_300);
 
     assert_eq!(ribbon(dim2vec("2x3x4")), 34);
     assert_eq!(ribbon(dim2vec("1x1x10")), 14);
-    let total_ribbon = sizes.iter()
+    let total_ribbon: i32 = sizes.iter()
         .map(|s| dim2vec(s))
-        .map(|d| ribbon(d))
-        .fold(0, |acc, s| acc + s);
-    assert_eq!(total_ribbon, 3737498);
+        .map(ribbon)
+        .sum();
+    assert_eq!(total_ribbon, 3_737_498);
 }

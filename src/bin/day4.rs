@@ -17,7 +17,7 @@ fn advent_coin(key: &str, found: &dyn Fn(Digest) -> bool) -> i32 {
         if found(digest) {
             break;
         }
-        num = num + 1;
+        num += 1;
     }
     num
 }
@@ -25,8 +25,8 @@ fn advent_coin(key: &str, found: &dyn Fn(Digest) -> bool) -> i32 {
 fn main() {
     const KEY: &str = "ckczppom";
 
-    assert_eq!(advent_coin("abcdef", &match_5), 609043);
-    assert_eq!(advent_coin("pqrstuv", &match_5), 1048970);
-    assert_eq!(advent_coin(KEY, &match_5), 117946);
-    assert_eq!(advent_coin(KEY, &match_6), 3938038);
+    assert_eq!(advent_coin("abcdef", &match_5), 609_043);
+    assert_eq!(advent_coin("pqrstuv", &match_5), 1_048_970);
+    assert_eq!(advent_coin(KEY, &match_5), 117_946);
+    assert_eq!(advent_coin(KEY, &match_6), 3_938_038);
 }

@@ -17,8 +17,8 @@ fn count_houses(directions: &str, num_santas: usize) -> usize {
     let mut santa = 0;
     for c in directions.chars() {
         let (dx, dy) = DIR.get(&c).expect("valid direction");
-        positions[santa].0 = positions[santa].0 + *dx;
-        positions[santa].1 = positions[santa].1 + *dy;
+        positions[santa].0 += *dx;
+        positions[santa].1 += *dy;
         visited.insert((positions[santa].0, positions[santa].1));
         santa = (santa + 1) % num_santas;
     }

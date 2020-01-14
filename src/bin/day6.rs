@@ -73,16 +73,16 @@ fn act_2(lights: &Lights, x: usize, y: usize, action: &Action) -> u32 {
     let prev = &lights[y][x];
     match action {
         Action::On => prev + 1,
-        Action::Off => if prev > &0 { prev - 1 } else { 0 },
+        Action::Off => if *prev > 0 { prev - 1 } else { 0 },
         Action::Toggle => prev + 2,
     }
 }
 
 fn process_instruction(lights: &mut Lights, from: &Coord, to: &Coord, action: &Action, act: &Act) {
     assert!(from.y <= to.y, "{} <= {}", from.y, to.y);
-    for y in from.y..(to.y + 1) {
+    for y in from.y..=to.y {
         assert!(from.x <= to.x, "{} <= {}", from.x, to.x);
-        for x in from.x..(to.x + 1) {
+        for x in from.x..=to.x {
             let xu = x as usize;
             let yu = y as usize;
             lights[yu][xu] = act(lights, xu, yu, action);
@@ -90,17 +90,17 @@ fn process_instruction(lights: &mut Lights, from: &Coord, to: &Coord, action: &A
     }
 }
 
-fn count_lights(instructions: &Vec<Instruction>, act: &Act) -> u32 {
+fn count_lights(instructions: &[Instruction], act: &Act) -> u32 {
     let mut lights: Lights = [[0u32; 1000]; 1000];
     for instr in instructions.iter() {
         process_instruction(&mut lights, &instr.from, &instr.to, &instr.action, act);
     }
     lights.iter()
         .map(|row| row.iter().fold(0, |acc, x| acc + *x))
-        .fold(0, |acc, x| acc + x)
+        .sum()
 }
 
-fn parse(lines: &Vec<String>) -> Vec<Instruction> {
+fn parse(lines: &[String]) -> Vec<Instruction> {
     lines.iter()
         .map(|s| Instruction::new(s))
         .collect()
@@ -108,6 +108,6 @@ fn parse(lines: &Vec<String>) -> Vec<Instruction> {
 
 fn main() {
     let instructions = parse(&load("data/day6.txt"));
-    assert_eq!(count_lights(&instructions, &act_1), 543903);
-    assert_eq!(count_lights(&instructions, &act_2), 14687245);
+    assert_eq!(count_lights(&instructions, &act_1), 543_903);
+    assert_eq!(count_lights(&instructions, &act_2), 14_687_245);
 }

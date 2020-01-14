@@ -55,11 +55,10 @@ impl WireValue<'_> {
             value: match wv.value {
                 Some(v) => Some(v),
                 None => match wv.wire {
-                    Some(k) => match wires.contains_key(k) {
-                        true => {
-                            Some(wires[k])
-                        },
-                        false => None
+                    Some(k) => if wires.contains_key(k) {
+                        Some(wires[k])
+                    } else {
+                        None
                     },
                     None => unreachable!("no value AND no wire name")
                 }
@@ -136,10 +135,7 @@ impl Instruction<'_> {
     pub fn all_signals_present(&self) -> bool {
         match self.lh1.value {
             Some(_) => match &self.lh2 {
-                Some(wv2) => match wv2.value {
-                    Some(_) => true,
-                    None => false
-                },
+                Some(wv2) => wv2.value.is_some(),
                 None => true
             },
             None => false
@@ -151,33 +147,30 @@ fn eval<'a>(instructions: Vec<Instruction<'a>>, wires: &Wires) -> Vec<Instructio
     instructions
         .into_iter()
         .map(|instr| {
-            match instr.all_signals_present() {
-                true => {
-                    match instr.gate {
-                        Gate::And => Instruction::new_assign(instr.lh1.value.unwrap() & instr.lh2.as_ref().unwrap().value.unwrap(), instr.rh),
-                        Gate::Or => Instruction::new_assign(instr.lh1.value.unwrap() | instr.lh2.as_ref().unwrap().value.unwrap(), instr.rh),
-                        Gate::Not => Instruction::new_assign(!instr.lh1.value.unwrap(), instr.rh),
-                        Gate::LShift => Instruction::new_assign(instr.lh1.value.unwrap() << instr.lh2.as_ref().unwrap().value.unwrap(), instr.rh),
-                        Gate::RShift => Instruction::new_assign(instr.lh1.value.unwrap() >> instr.lh2.as_ref().unwrap().value.unwrap(), instr.rh),
-                        _ => instr
-                    }
-                },
-                false => {
-                    Instruction::apply(instr, wires)
+            if instr.all_signals_present() {
+                match instr.gate {
+                    Gate::And => Instruction::new_assign(instr.lh1.value.unwrap() & instr.lh2.as_ref().unwrap().value.unwrap(), instr.rh),
+                    Gate::Or => Instruction::new_assign(instr.lh1.value.unwrap() | instr.lh2.as_ref().unwrap().value.unwrap(), instr.rh),
+                    Gate::Not => Instruction::new_assign(!instr.lh1.value.unwrap(), instr.rh),
+                    Gate::LShift => Instruction::new_assign(instr.lh1.value.unwrap() << instr.lh2.as_ref().unwrap().value.unwrap(), instr.rh),
+                    Gate::RShift => Instruction::new_assign(instr.lh1.value.unwrap() >> instr.lh2.as_ref().unwrap().value.unwrap(), instr.rh),
+                    _ => instr
                 }
+            } else {
+                Instruction::apply(instr, wires)
             }
         })
         .collect()
 }
 
 fn run<'a>(instructions: Vec<Instruction<'a>>, wires: &mut Wires<'a>) {
-    // break out?
+// break out?
     if instructions.is_empty() {
         return;
     }
-    // resolve all fully signalled gates to assignments
+// resolve all fully signalled gates to assignments
     let mut instructions: Vec<Instruction> = eval(instructions, wires);
-    // move all assignments to the wires hashtable
+// move all assignments to the wires hashtable
     instructions.retain(|instr| {
         match instr.gate {
             Gate::Assign => {
@@ -197,7 +190,7 @@ fn run<'a>(instructions: Vec<Instruction<'a>>, wires: &mut Wires<'a>) {
     run(instructions, wires);
 }
 
-fn parse(lines: &Vec<String>) -> Vec<Instruction> {
+fn parse(lines: &[String]) -> Vec<Instruction> {
     lines.iter()
         .map(|s| Instruction::new(s))
         .collect()

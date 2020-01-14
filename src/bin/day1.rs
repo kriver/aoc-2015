@@ -6,7 +6,7 @@ fn floor(directions: &str) -> (i32, Option<i32>) {
     let mut basement_found = false;
     for c in directions.chars() {
         if !basement_found {
-            pos = pos + 1;
+            pos += 1;
         }
         floor = if c == '(' { floor + 1 } else { floor - 1 };
         if floor < 0 {

@@ -8,13 +8,13 @@ fn is_nice(s: &str) -> bool {
     let mut prev: Option<char> = None;
     for c in s.chars() {
         if "aeiou".contains(c) {
-            vowels = vowels + 1;
+            vowels += 1;
         }
-        if prev.is_some() {
-            if prev.unwrap() == c {
+        if let Some(prev_c) = prev {
+            if prev_c == c {
                 has_double = true;
             }
-            let prohibited = format!("{}{}", prev.unwrap(), c);
+            let prohibited = format!("{}{}", prev_c, c);
             if "ab" == prohibited || "cd" == prohibited || "pq" == prohibited || "xy" == prohibited {
                 has_prohibited = true;
             }
@@ -31,13 +31,12 @@ fn is_really_nice(s: &str) -> bool {
     let mut prevprev: Option<char> = None;
     let mut prev: Option<char> = None;
     for (i, c) in s.chars().enumerate() {
-        if prev.is_some() {
-            let digram = format!("{}{}", prev.unwrap(), c);
+        if let Some(prev_c) = prev {
+            let digram = format!("{}{}", prev_c, c);
             match pairs.get(&digram) {
                 Some(offset) => repeat_double = offset + 2 <= i,
                 None => {
                     pairs.insert(digram, i);
-                    ()
                 }
             }
         }
@@ -50,7 +49,7 @@ fn is_really_nice(s: &str) -> bool {
     repeat_double && repeat_skip
 }
 
-fn count_nice(strings: &Vec<String>, is_nice: &dyn Fn(&str) -> bool) -> usize {
+fn count_nice(strings: &[String], is_nice: &dyn Fn(&str) -> bool) -> usize {
     strings.iter()
         .filter(|s| is_nice(s.as_str()))
         .count()

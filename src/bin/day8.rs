@@ -7,17 +7,17 @@ fn count_decoded(s: &str) -> (usize, usize) {
     // skip enclosing double quotes
     for c in s[1..s.len() - 1].chars() {
         if skip > 0 {
-            skip = skip - 1
+            skip -= 1
         } else if backslash {
             if c == 'x' {
                 skip = 2
             }
-            sz = sz + 1; // count backslash'ed character
+            sz += 1; // count backslash'ed character
             backslash = false;
         } else if c == '\\' {
             backslash = true;
         } else {
-            sz = sz + 1
+            sz +=  1
         }
     }
     (s.len(), sz)
@@ -34,7 +34,7 @@ fn count_encoded(s: &str) -> (usize, usize) {
     (s.len(), 2 + sz) // extra 2 for quotes
 }
 
-fn count_all(lines: &Vec<String>, count: &dyn Fn(&str) -> (usize, usize)) -> (usize, usize) {
+fn count_all(lines: &[String], count: &dyn Fn(&str) -> (usize, usize)) -> (usize, usize) {
     lines.iter()
         .map(|s| count(s.as_str()))
         .fold((0, 0), |acc, sz| (acc.0 + sz.0, acc.1 + sz.1))

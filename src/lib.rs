@@ -10,7 +10,7 @@ pub fn load(filename: &str) -> Vec<String> {
         .collect()
 }
 
-pub fn str_from_capture<'a>(captures: &'a Captures, i: usize) -> String {
+pub fn str_from_capture(captures: &Captures, i: usize) -> String {
     match captures.get(i) {
         Some(m) => m.as_str().to_string(),
         None => unreachable!("expected string for capture {}", i)
